@@ -1,31 +1,32 @@
-function fixedWidthTextFile(){
+interface FixedWidthParser {
+    columns: { name: string, start: number, end: number }[];
+    lines: string[];
+    records: { [key: string]: string }[];
+    addColumn(name: string, start: number, end: number): void;
+    setText(txt: string, eol?: string): void;
+    parse(): void;
+}
 
-    let obj ={
+let fixedWidthParser: FixedWidthParser = {
+    columns: [],
+    lines: [],
+    records: [],
 
-        columns : [] as { name: string, start: number, end: number }[],
-        lines: [] as string[],
-        records: [] as string[],
+    addColumn(name, start, end) {
+        this.columns.push({ name, start, end });
+    },
 
-        addColumn: function ( name: string, start: number, end: number ){
-            obj.columns.push( { "name": name, "start": start, "end": end } )
-        },
+    setText(txt, eol = '\n') {
+        this.lines = txt.split(eol);
+    },
 
-        setText: function ( txt: string, eol: string = '\n' ){
-            obj.lines = txt.split( eol );
-        },
-
-        parse: function(){
-            for ( let line of obj.lines ){
-                let record = {} as string;
-
-                for ( let column of obj.columns ){
-                    record[column.name] = line.substring(column.start, column.end).trim();
-                }
-
-                obj.records.push(record);
+    parse() {
+        for (let line of this.lines) {
+            let record: { [key: string]: string } = {};
+            for (let column of this.columns) {
+                record[column.name] = line.substring(column.start, column.end).trim();
             }
+            this.records.push(record);
         }
     }
-
-    return obj;
- }
+};
