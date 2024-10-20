@@ -1,11 +1,9 @@
-# FWTF_typescript
+# FWTF_typescript (Fixed Width Text File / Typescript)
 A bare bones implementation of the Fixed Width Text File Toolkit, in TypeScript. 
 
-Because the best way to learn a new programming language . . . is to destroy any joy you once felt for a passion project. 🙄
+I'm not going to rehash the "Why" behind the Fixed Width Text File Toolkit. If you don't need and/or like it, *then don't use it & move along*.
 
-I'm not going to rehash the "Why" behind the Fixed Width Text File Toolkit. If you don't need it or like it, *then don't use it & move on*.
-
-Let's say you've got a chunk of fixed width text, like this one below:
+Suppose you've got a chunk of fixed width text, like this:
 
 ```
 let testing = 
@@ -27,37 +25,44 @@ let testing =
 07/06/2016  08:02 PM    <DIR>          Vigenere-Cipher`
 ```
 
-I've assigned it as a string literal to a variable, but you could read it from a file, a form field, etc. You know that part of your situation better than I do, ok?
+I've assigned it as a string literal to a variable, but you could read it from a file, a form field, etc. 
 
-Create an instance of the Fixed Width Text File object, like so:
+After transpiling fixedWidthParser.ts into JavaScript and adding it into your project, you first feed the text into the object:
 
-`let myFWTF = new (fixedWidthTextFile as any)();`
+`fixedWidthParser.setText(testing);`
 
-Feed the text into the object:
+This splits the text into lines, and assumes the EOL character is "\n". 
 
-`myFWTF.setText(testing);`
+If that's incorrect, you can override like this:
 
-This splits the text into lines, with the assumption the EOL character is "\n". If that's incorrect, you can override like this:
+`fixedWidthParser.setText(testing, '\r\n');`
 
-`myFWTF.setText(testing, '\r\n');`
+Next, define the column(s) you are interested in:
 
-Define the column(s) you are interested in:
+```
+fixedWidthParser.addColumn("date", 0, 11);  // remember, JS starts counting from 0, so adjust accordingly
+fixedWidthParser.addColumn("name", 39, 72);
+```
 
-`myFWTF.addColumn("date", 0, 12);  // remember, JS starts counting from 0, so adjust accordingly
-myFWTF.addColumn("name", 39, 72);`
+I've left out the time and type columns because I'm not interested in them, but they'd look something like this:
 
-I've deliberately left out the time and type columns because I'm not interested in them, but they'd look something like this, obviously:
+```
+fixedWidthParser.addColumn("time", 12, 23);
+fixedWidthParser.addColumn("type", 24, 38);
+```
 
-`// myFWTF.addColumn("time", 12, 24);
-// myFWTF.addColumn("type", 24, 39);`
+Once we've defined what we're looking for, we can parse the data.
 
-Now that we've defined what we're looking for, let's parse the data.
+`fixedWidthParser.parse();`
 
-`myFWTF.parse();`
-
-From here, myFWTF.records should have an array of objects corresponding to the columnar data you wanted. Because it's an array, you can map or filter or whatever you want to do.
+From here, *fixedWidthParser.records* should have an array of objects corresponding to the columnar data you wanted. Since this is an array, you can map, filter, or whatever array functions you wish.
 
 If you just want to extract the data into JSON, you can do this:
 
-`JSONResults = JSON.stringify( myFWTF.records );`
+`JSONResults = JSON.stringify( fixedWidthParser.records );`
 
+## NOTES / THINGS TO BEAR IN MIND:
+
+If you parse() and get only a single record, check your EOL-- it's probably not what you think it is (e.g. \r\n instead of \n, or vice versa).
+
+Invoking the parse() method does *NOT* pre-emptively clear the .records array at this time; it appends the new records to the ones you previously parsed. The logic behind this choice is "I can parse a series of log files with the same columns in rapid succession and combine the data with just .setText() and .parse()" . . . so there might be cases where you want to fixedWidthParser.records = [] to "reset" before you parse a new file.
