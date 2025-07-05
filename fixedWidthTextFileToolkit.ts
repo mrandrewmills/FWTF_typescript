@@ -16,7 +16,16 @@ let fixedWidthParser: FixedWidthParser = {
         this.columns.push({ name, start, end });
     },
 
-    setText(txt, eol = '\n') {
+    setText(txt: string, eol?: string) {
+        if (!eol) {
+            if (txt.includes('\r\n')) {
+                eol = '\r\n'; // Windows-style
+            } else if (txt.includes('\r')) {
+                eol = '\r';   // Classic Mac-style
+            } else {
+                eol = '\n';   // Unix/Linux-style
+            }
+        }
         this.lines = txt.split(eol);
     },
 
