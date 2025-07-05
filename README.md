@@ -31,9 +31,9 @@ After transpiling fixedWidthParser.ts into JavaScript and adding it into your pr
 
 `fixedWidthParser.setText(testing);`
 
-This splits the text into lines, and assumes the EOL character is "\n". 
+This splits the text into lines, and leaves it up to the script to "auto-detect" the kind of line-breaks (i.e. CR, LF, or CR/LF) 
 
-If that's incorrect, you can override like this:
+If the "auto-detect" results are incorrect, you can override like this:
 
 `fixedWidthParser.setText(testing, '\r\n');`
 
